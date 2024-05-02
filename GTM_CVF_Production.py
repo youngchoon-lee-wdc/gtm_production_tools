@@ -27,6 +27,7 @@ def add_parse_arguments():
 
 if __name__ == "__main__":
     logger = logging.getLogger('GTM_Production')
+    rc = -1
     try:
         log_path = './'
         log_file_name = 'gtm_production'
@@ -40,8 +41,8 @@ if __name__ == "__main__":
         logger.addHandler(consoleHandler)
         log_level = logging.DEBUG
         logger.setLevel(log_level)        
-        if _current_dir.find(CVF_HOME) == -1:
-            raise Exception("You have to run it in %s" % CVF_HOME)
+        # if _current_dir.find(CVF_HOME) == -1:
+        #     raise Exception("You have to run it in %s" % CVF_HOME)
         options, args = add_parse_arguments()
         commit_id = (options.commit_id)[:7]
         product = options.product
@@ -55,8 +56,8 @@ if __name__ == "__main__":
             raise Exception('No given option value are found')        
         if isPerformanceApp == '' or isPerformanceApp.lower() == 'no':
             raise Exception('GTM production tool supports to run Performance(CDM/IOMeter/SSW) only for now')        
-        gtm_production_bat = os.path.join(_current_dir, 'gtm_production.bat')    
-        run_bat_cmd = 'gtm_production_bat %s %s %s %s %s %s %s' % (commit_id, product, device_vendor, device_serial_number, device_capacity, project, cvf_version)
+        gtm_production_bat = os.path.join(_filepath, 'gtm_production_%s.bat' % project)    
+        run_bat_cmd = 'gtm_production_%s.bat %s %s %s %s %s %s %s' % (project, commit_id, product, device_vendor, device_serial_number, device_capacity, project, cvf_version)
         logger.debug(run_bat_cmd)
         p = Popen([gtm_production_bat, commit_id, product, device_vendor, device_serial_number, device_capacity, project, cvf_version], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         while True:

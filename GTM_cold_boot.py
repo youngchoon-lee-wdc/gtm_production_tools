@@ -28,7 +28,6 @@ if __name__ == "__main__":
     gtm_hostname = sys.argv[1].strip()
     command = sys.argv[2].strip()
     print(f"hostname : {gtm_hostname}, command : {command}")
-
     webclicker_url = f"http://{GTM_WEBCLICKER_SERVER}:5000/{gtm_hostname}__{command}"
     send_command = send_webclicker_command(webclicker_url)
     print(f'{gtm_hostname} is issued by {command} command')
