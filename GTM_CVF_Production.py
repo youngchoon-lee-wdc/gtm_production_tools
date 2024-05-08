@@ -56,7 +56,8 @@ if __name__ == "__main__":
             raise Exception('No given option value are found')        
         if isPerformanceApp == '' or isPerformanceApp.lower() == 'no':
             raise Exception('GTM production tool supports to run Performance(CDM/IOMeter/SSW) only for now')        
-        gtm_production_bat = os.path.join(_filepath, 'gtm_production_%s.bat' % project)    
+        gtm_production_bat = os.path.join(os.path.dirname(_filepath), 'gtm_production_%s.bat' % project.lower())    
+        logger.debug(gtm_production_bat)
         run_bat_cmd = 'gtm_production_%s.bat %s %s %s %s %s %s %s' % (project, commit_id, product, device_vendor, device_serial_number, device_capacity, project, cvf_version)
         logger.debug(run_bat_cmd)
         p = Popen([gtm_production_bat, commit_id, product, device_vendor, device_serial_number, device_capacity, project, cvf_version], stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -73,7 +74,7 @@ if __name__ == "__main__":
         if rc != 0:
             raise Exception("Failed to run the batch file")           
 
-        os.system("shutdown /r /t 2")
+        # os.system("shutdown /r /t 2")
 
     except Exception as err:
         logger.error(err, exc_info=1)

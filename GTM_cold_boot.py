@@ -3,7 +3,7 @@ import time
 import requests
 import subprocess
 
-GTM_WEBCLICKER_SERVER='10.163.203.16'
+GTM_WEBCLICKER_SERVER='http://10.163.203.164:5000'
 
 def check_host_status(host):
     host = host.strip()+'.sdcorp.global.sandisk.com'
@@ -27,10 +27,11 @@ if __name__ == "__main__":
 
     gtm_hostname = sys.argv[1].strip()
     command = sys.argv[2].strip()
-    print(f"hostname : {gtm_hostname}, command : {command}")
-    webclicker_url = f"http://{GTM_WEBCLICKER_SERVER}:5000/{gtm_hostname}__{command}"
+    print("hostname : %s, command : %s" % (gtm_hostname, command))
+    webclicker_url = "%s/%s__%s" % (GTM_WEBCLICKER_SERVER, gtm_hostname, command)
+    print("webclicker_url:%s" % webclicker_url)
     send_command = send_webclicker_command(webclicker_url)
-    print(f'{gtm_hostname} is issued by {command} command')
+    print('%s is issued by %s command' % (gtm_hostname, command))
     if send_command is None:
         sys.exit(1)
 
@@ -38,9 +39,9 @@ if __name__ == "__main__":
         # Sleep for 10 seconds
         time.sleep(10)
         if check_host_status(gtm_hostname) == False:
-            print(f"{gtm_hostname} is down, so it should be turned on")
+            print("%s is down, so it should be turned on" % gtm_hostname)
             # If command is 'Power', retry the same URL to turn on the machine for cold boot
             power_on = send_webclicker_command(webclicker_url)
-            print(f'{gtm_hostname} is issued by {command} command again')
+            print('%s is issued by %s command again' % (gtm_hostname, command))
             if power_on is None:
                 sys.exit(1)
