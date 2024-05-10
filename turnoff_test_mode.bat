@@ -13,11 +13,7 @@ C:\Windows\System32\pnputil.exe /add-driver "C:\Windows\INF\stornvme.inf" /insta
 echo Switched driver successfully (SanDisk NVMe --> Standard NVM Express Controller) 
 
 echo It's about to restart machine after CVF production..
-REM Delete the task scheduler Star_Client_Service_EventId-4634
-C:\Windows\System32\schtasks.exe /end /tn Star_Client_Service
-
-TIMEOUT /T 5
-
-python "C:\Perf_Automation\gtm_production_tools\GTM_cold_boot.py" %hostname% %webclicker_command%
+@REM TIMEOUT /T 5
+@REM python "C:\Perf_Automation\gtm_production_tools\GTM_cold_boot.py" %hostname% %webclicker_command%
 echo %ERRORLEVEL%
 @REM shutdown /r /t 5
