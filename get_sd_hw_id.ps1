@@ -2,23 +2,13 @@
 $deviceName = "SanDisk NVME"
 
 # Get the device information using WMI
-$device = Get-WmiObject Win32_PnPEntity | Where-Object { $_.Name -like "*$deviceName*" }
+$driverInstance = Get-WmiObject Win32_PnPSignedDriver | Where-Object { $_.DeviceName -eq $deviceName }
 
-# Check if the device is found
-if ($device) {
-    # Retrieve the hardware IDs
-    $hardwareIds = $device.GetDeviceProperties("DEVPKEY_Device_HardwareIds")
-    
-    # Check if hardware IDs are available
-    if ($hardwareIds) {
-        # Get the first hardware ID
-        $firstHardwareId = $hardwareIds[0].Data
-        Write-Output "The first Hardware ID is: $firstHardwareId"
-    } else {
-        Write-Output "No Hardware IDs found for the specified device."
-    }
-} else {
-    Write-Output "Device not found."
+if (-not $driverInstance) {
+    Write-Host "Driver not found."
+    exit
 }
 
-Write-Output "Hardware Ids: $firstHardwareId"
+# Get the hardware ID
+$hardwareIds = $driverInstance.HardwareID
+Write-Host "Hardware Ids: $hardwareIds"

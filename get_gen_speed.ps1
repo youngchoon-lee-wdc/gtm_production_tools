@@ -21,6 +21,7 @@ if ($device) {
     }
 } else {
     Write-Output "Device not found."
+    exit 1
 }
 
 # Format the result as Gen[last index of the value]

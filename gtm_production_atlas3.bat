@@ -49,7 +49,8 @@ echo python Python\Production.py --device_vendor=%device_vendor% --device_serial
 cd python
 echo %cd%
 python Production.py --device_vendor=%device_vendor% --device_serial_number=%device_serial_number% --device_capacity=%device_capacity%  --security_production=1 --sku_file=C:\Atlas3\BOT\sku_file.txt --bot_file=C:\Atlas3\BOT\CFG.bot --security_production_secrets_config_file="C:\Program Files (x86)\SanDisk\CVF_2.0_x64\config\MoonshotDownloadPSS.ini"
-
+IF %ERRORLEVEL% NEQ 0 (
+    EXIT /B %ERRORLEVEL%
+)
 set path=C:\Users\%USERNAME%\.pyenv\pyenv-win\versions\2.7.14;C:\Windows\System32;
-
 echo %ERRORLEVEL%
