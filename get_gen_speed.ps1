@@ -85,6 +85,7 @@ if ($pciLinkSpeed -lt $minimumRequiredGenSpeed) {
         Send-EmailNotification
         Write-Host "Deleting the restart count file..."
         Remove-Item -Path $restartCountFile -Force
+        exit 1
     }
 
     Restart-Computer -Force
