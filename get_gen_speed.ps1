@@ -67,7 +67,7 @@ $maxRestartCount = 3
 # Function to send an email notification
 function Send-EmailNotification {
     $smtpServer = "milrelay.sandisk.com"
-    $smtpFrom = "your-email@yourdomain.com"
+    $smtpFrom = "svc-ep-jenm01@wdc.com"
     $smtpTo = "youngchoon.lee@wdc.com,SangMin.Seok2@wdc.com,Jeonghwa.Kim@wdc.com,minlee.ha@wdc.com"
     $messageSubject = "GTM Machine Restart Alert"
     $messageBody = "The machine has restarted more than $maxRestartCount times due to Gen spped is less than minimum required Gen$minimumRequiredGenSpeed"
