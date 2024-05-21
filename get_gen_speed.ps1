@@ -1,7 +1,7 @@
 # Ensure the target directory exists
-$targetDirectory = "C:\GenSpeedResult"
-if (-not (Test-Path -Path $targetDirectory)) {
-    New-Item -ItemType Directory -Path $targetDirectory
+$GenSpeedResultDir = "C:\GenSpeedResult"
+if (-not (Test-Path -Path $GenSpeedResultDir)) {
+    New-Item -ItemType Directory -Path $GenSpeedResultDir
 }
 
 $deviceName = "Standard NVM Express Controller"
@@ -33,7 +33,7 @@ Write-Output $genSpeedStr
 
 # Create a timestamped filename
 $timestamp = Get-Date -Format "yyyy-MM-dd-HHmmss"
-$filename = "$targetDirectory\$timestamp.txt"
+$filename = "$GenSpeedResultDir\$timestamp.txt"
 
 # Save the PCI current link speed to the file
 $genSpeedStr | Out-File -FilePath $filename
@@ -42,10 +42,11 @@ $genSpeedStr | Out-File -FilePath $filename
 Write-Host "PCI current link speed saved to $filename"
 
 # Define the path to the file that stores the restart count
-$restartCountFile = "$targetDirectory\restart_count.txt"
+$restartCountFile = "$GenSpeedResultDir\restart_count.txt"
 
 # Function to get the current restart count from the file
 function Get-RestartCount {
+    Write-Host "Getting restart count from $restartCountFile file..."
     if (Test-Path $restartCountFile) {
         return [int](Get-Content $restartCountFile)
     } else {
@@ -68,11 +69,21 @@ $maxRestartCount = 3
 function Send-EmailNotification {
     $smtpServer = "milrelay.sandisk.com"
     $smtpFrom = "svc-ep-jenm01@wdc.com"
-    $smtpTo = "youngchoon.lee@wdc.com,SangMin.Seok2@wdc.com,Jeonghwa.Kim@wdc.com,minlee.ha@wdc.com"
-    $messageSubject = "GTM Machine Restart Alert"
-    $messageBody = "The machine has restarted more than $maxRestartCount times due to Gen spped is less than minimum required Gen$minimumRequiredGenSpeed"
-
-    Send-MailMessage -SmtpServer $smtpServer -From $smtpFrom -To $smtpTo -Subject $messageSubject -Body $messageBody
+    $smtpTo = "Young Choon Lee <YoungChoon.Lee@wdc.com>", "JeongHwa Kim <Jeonghwa.Kim@wdc.com>", "Minlee Ha <minlee.ha@wdc.com>", "SangMin Seok <SangMin.Seok2@wdc.com>"
+    $hostname = (Get-ComputerInfo).CsName
+    $messageSubject = "GTM Machine($hostname) Restart Alert - Genspeed is less than minimum required Gen$minimumRequiredGenSpeed "
+    $messageBody = @"
+    <html>
+    <body>
+        <h1>GTM Machine($hostname) Restart Alert</h1>
+        <p>The machine($hostname) has restarted more than $maxRestartCount times due to Genspeed was <font color=red>Gen$pciLinkSpeed</font>.</p>
+        <p>It is less than minimum required <font color=blue>Gen$minimumRequiredGenSpeed</font>.</p>
+        <p>So please check Genspeed on the machine.</p>
+    </body>
+    </html>
+"@    
+    Write-Host $messageBody   
+    Send-MailMessage -SmtpServer $smtpServer -From $smtpFrom -To $smtpTo -Subject $messageSubject -Body $messageBody -BodyAsHtml
 }
 
 
@@ -88,9 +99,27 @@ if ($pciLinkSpeed -lt $minimumRequiredGenSpeed) {
         exit 1
     }
 
-    Restart-Computer -Force
+    # Restart-Computer -Force
 } else {
     Write-Host "Value is $minimumRequiredGenSpeed or greater. No action needed."
+}
+
+$keepFileDays = 7
+$currentDate = Get-Date
+$timeSpan = New-TimeSpan -Days $keepFileDays
+
+# Get all .txt files in the specified folder
+$txtFiles = Get-ChildItem -Path $GenSpeedResultDir -Filter *.txt
+
+foreach ($file in $txtFiles) {
+    # Calculate the age of the file
+    $fileAge = $currentDate - $file.CreationTime
+    
+    # Check if the file is older than one week
+    if ($fileAge -gt $timeSpan) {
+        Write-Host "Deleting file: $($file.FullName)"
+        Remove-Item -Path $file.FullName -Force
+    }
 }
 
 
