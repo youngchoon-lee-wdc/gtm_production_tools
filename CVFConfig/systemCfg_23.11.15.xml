@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:System xmlns:ns0="vtfSchema" AgentSmith="agent_smith_hal" AsyncMode="true" Host="" LoopModule="" NVMeMI="" PlaylistDir="C:\Program Files (x86)\SanDisk\SanDisk ValidationScripts\FVT_Moonshot" SerialCommunication="HIDAndCOMPorts" TestsCfgDir="C:\Program Files (x86)\SanDisk\SanDisk ValidationScripts\FVT_Moonshot" TestsDir="C:\Program Files (x86)\SanDisk\SanDisk ValidationScripts\FVT_Moonshot" Utility="INFORMER" apparatus="" debugMode="STOP_ON_ERROR" device="MOONSHOT" dpaUse="false" esdUse="false" executeOverUart="false" frwType="CVF" gen4hw="" isModel="false" outOfBandMedium="" p2p="" pcieGenHW="" power_board="" printHistoryOnPass="true" protocol="NVMe" set_env_batch_file_path="" stopOnNCommands="" stopOnRWNMBs="" stopOnReadNMBs="" stopOnWriteNMBs="" usePoolMgr="true" useStubs="false" waitForThreadCompletionAfterTest="true" xPlorerUse="false">
+
+    <ns0:Logger copyTestLogOnPass="true" copyTritonLogOnPass="false" count_of_line_for_log_rotation="70000" logFilename="" logFolder="c:\tests\Logs" logToStdout="true" log_file_count="0" log_level="INFO" log_module="LIB_ThreadPool:INFO" loggerName="" />
+
+    <ns0:FrameWork DeviceReport="true" adapter="0" afterTestReport="true" deviceKey="" stopOnReportError="false">
+        <ns0:EntryForAll />
+        <ns0:Entry first="NONE" />
+    </ns0:FrameWork>
+
+    <ns0:EcoSystem DisableEcoSystem="false">
+        <ns0:Regression EnableRegrssionDB="true" dbProject="FWR_IL_Atlas3" server="milsqlip05" />
+        <ns0:LogsToNetwork EnableLogsToNetwork="false" UserFilesToFAR="" copyTestLogOnPass="false" copyTritonLogOnPass="false" faFolder="\\seouniip01\CSS-Firmware\Integration\Moonshot\FVT\Logs" fileCountToZip="100" />
+        <ns0:AVT EnableAVT="false" GitOrigin="gitsdin.sandisk.com/css/hermes/develop" RegressionZipPackage="" avtversion="2.0.0" />
+        <ns0:AURA EnableAURA="false" automationSystem="STAR" fileVersion="0.0" testBool="false" validationType="fvt" />
+        <ns0:FARAgent EnableFARAgent="true" UseRegressionDB="true" farbackupserver="css-far-stag-01.lab.sandisk.com:90" farserver="css-far-prod-01.lab.sandisk.com" />
+        <ns0:VYOM EnableVYOM="false" LaunchFrom="STAR" vyomserver="10.206.251.126" />
+        <ns0:DeviceLogs CaptureDeviceLogs="" />
+        <ns0:DeviceHealth EnableDeviceHealthCheck="false" />
+    </ns0:EcoSystem>
+
+    <ns0:NVMeConfigParams>
+        <ns0:UInt32 name="Arbitration_Type">0</ns0:UInt32>
+        <ns0:UInt32 name="LBA_Format">0</ns0:UInt32>
+        <ns0:UInt32 name="Temp_Threshold">1</ns0:UInt32>
+        <ns0:UInt32 name="ITPT">1</ns0:UInt32>
+        <ns0:UInt32 name="TLER">1</ns0:UInt32>
+        <ns0:UInt32 name="ITPS">1</ns0:UInt32>
+        <ns0:UInt32 name="No_Sub_Queues">1</ns0:UInt32>
+        <ns0:UInt32 name="No_PC_Sub_Queues">10</ns0:UInt32>
+        <ns0:UInt32 name="No_Comp Queues">1</ns0:UInt32>
+        <ns0:UInt32 name="No_PC_Comp_Queues">0</ns0:UInt32>
+        <ns0:UInt32 name="No_Intr_Enabled_Comp_Queues">1</ns0:UInt32>
+        <ns0:UInt32 name="No_Namespaces">1</ns0:UInt32>
+        <ns0:UInt32 name="No_Urg_Queues">0</ns0:UInt32>        
+        <ns0:UInt32 name="No_HPW_Queues">10</ns0:UInt32>
+        <ns0:UInt32 name="No_MPW_Queues">0</ns0:UInt32>
+        <ns0:UInt32 name="No_LPW_Queues">0</ns0:UInt32>
+        <ns0:String name="Intr_Mode">0</ns0:String>
+        <ns0:String name="Meta_Data_Option">0</ns0:String>
+        <ns0:Bool name="Secure_Erase_Setting">false</ns0:Bool>
+        <ns0:UInt32 name="Last_N_Cmd_HistLen">0</ns0:UInt32>
+        <ns0:Bool name="Failure_Handle_Request">false</ns0:Bool>   
+        <ns0:UInt32 name="FW_Slot">0</ns0:UInt32>
+        <ns0:UInt32 name="FW_Download_Size">0</ns0:UInt32>
+        <ns0:UInt32 name="FW_Commit_Type">0</ns0:UInt32>
+        <ns0:String name="Heartbeat_Filename">0</ns0:String>
+        <ns0:String name="FW_Download_Filename">0</ns0:String>
+      </ns0:NVMeConfigParams>
+      <ns0:CommonTestParams>
+        <ns0:UInt32 name="Batch_Size">512</ns0:UInt32>
+        <ns0:UInt32 name="Queue_Depth">256</ns0:UInt32>
+        <ns0:UInt32 name="Inject_Delay_Between_Cmds">10</ns0:UInt32>
+        <ns0:String name="Queue_Mode">SingleCmd</ns0:String>
+        <ns0:UInt32 name="Power_State">0</ns0:UInt32>
+        <ns0:Bool name="Power_Cycle_Enabled">true</ns0:Bool>
+        <ns0:Bool name="Flow_Control_Flag">true</ns0:Bool>
+        <ns0:String name="Power_Source">SingleCmd</ns0:String>
+        <ns0:Int32Range name="Access_Type">0 999</ns0:Int32Range>
+        <ns0:UInt32 name="Test_Precondition">0</ns0:UInt32>
+        <ns0:UInt32 name="Test_Postcondition">0</ns0:UInt32>
+        <ns0:UInt32 name="Group_ID">0</ns0:UInt32>
+        <ns0:UInt32 name="Test_ID">0</ns0:UInt32>
+      </ns0:CommonTestParams>
+      <ns0:TLFConfigParams>
+        <ns0:String name="systemName">OGT-SANDISK-3U-31</ns0:String>
+        <ns0:String name="userName">oakgate</ns0:String>
+        <ns0:String name="subnets">10.0.0.*</ns0:String>
+        <ns0:String name="controllerPath">C:\OakGate\SVF\Controller</ns0:String>
+        <ns0:String name="hostIP">10.0.171.85</ns0:String>
+        <ns0:String name="OakgateTestType">DT</ns0:String>
+        <ns0:UInt32 name="deviceId">20481</ns0:UInt32>
+        <ns0:UInt32 name="busNo">5</ns0:UInt32>
+        <ns0:UInt32 name="portId">14</ns0:UInt32>
+        <ns0:String name="dtname" />
+        <ns0:String name="ioAT3Filename" />
+      </ns0:TLFConfigParams>
+
+</ns0:System>

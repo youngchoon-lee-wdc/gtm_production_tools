@@ -45,6 +45,9 @@ cd %SANDISK_CTF_HOME%
 echo CURRENT_INSTALLATION_FOLDER is %CURRENT_INSTALLATION_FOLDER%
 echo PYTHONHOME is %PYTHONHOME%
 echo PYTHONPATH is %PYTHONPATH% 
+@REM install requred python lib
+pip install pywin32
+
 echo python Python\Production.py --device_vendor=%device_vendor% --device_serial_number=%device_serial_number% --device_capacity=%device_capacity%  --security_production=1 --sku_file=C:\Atlas3\BOT\sku_file.txt --bot_file=C:\Atlas3\BOT\CFG.bot --security_production_secrets_config_file="C:\Program Files (x86)\SanDisk\CVF_2.0_x64\config\MoonshotDownloadPSS.ini"
 cd python
 echo %cd%

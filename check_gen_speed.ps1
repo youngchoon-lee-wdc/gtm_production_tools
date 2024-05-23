@@ -41,29 +41,7 @@ $genSpeedStr | Out-File -FilePath $filename
 # Output the result
 Write-Host "PCI current link speed saved to $filename"
 
-# Define the path to the file that stores the restart count
-$restartCountFile = "$GenSpeedResultDir\restart_count.txt"
-
-# Function to get the current restart count from the file
-function Get-RestartCount {
-    Write-Host "Getting restart count from $restartCountFile file..."
-    if (Test-Path $restartCountFile) {
-        return [int](Get-Content $restartCountFile)
-    } else {
-        return 0
-    }
-}
-
-# Function to increment and save the restart count
-function Increment-RestartCount {
-    $count = Get-RestartCount
-    $count++
-    Set-Content -Path $restartCountFile -Value $count
-    return $count
-}
-
 $minimumRequiredGenSpeed = 4
-$maxRestartCount = 3
 
 # Function to send an email notification
 function Send-EmailNotification {
@@ -71,12 +49,12 @@ function Send-EmailNotification {
     $smtpFrom = "svc-ep-jenm01@wdc.com"
     $smtpTo = "Young Choon Lee <YoungChoon.Lee@wdc.com>", "JeongHwa Kim <Jeonghwa.Kim@wdc.com>", "Minlee Ha <minlee.ha@wdc.com>", "SangMin Seok <SangMin.Seok2@wdc.com>"
     $hostname = (Get-ComputerInfo).CsName
-    $messageSubject = "GTM Machine($hostname) Restart Alert - Genspeed is less than minimum required Gen$minimumRequiredGenSpeed "
+    $messageSubject = "GTM Machine($hostname) Alert - Genspeed is less than minimum required Gen$minimumRequiredGenSpeed "
     $messageBody = @"
     <html>
     <body>
-        <h1>GTM Machine($hostname) Restart Alert</h1>
-        <p>The machine($hostname) has restarted more than $maxRestartCount times due to Genspeed was <font color=red>Gen$pciLinkSpeed</font>.</p>
+        <h1>GTM Machine($hostname) Alert</h1>
+        <p>The Genspeed was <font color=red>Gen$pciLinkSpeed</font> on the machine($hostname).</p>
         <p>It is less than minimum required <font color=blue>Gen$minimumRequiredGenSpeed</font>.</p>
         <p>So please check Genspeed on the machine.</p>
     </body>
@@ -88,18 +66,9 @@ function Send-EmailNotification {
 
 
 if ($pciLinkSpeed -lt $minimumRequiredGenSpeed) {
-    Write-Host "Gen speed is less than $minimumRequiredGenSpeed. Restarting the machine..."
-    $restartCount = Increment-RestartCount
-
-    if ($restartCount -gt $maxRestartCount) {
-        Write-Host "Restart count has exceeded $maxRestartCount. Sending email notification..."
-        Send-EmailNotification
-        Write-Host "Deleting the restart count file..."
-        Remove-Item -Path $restartCountFile -Force
-        exit 1
-    }
-
-    Restart-Computer -Force
+    Write-Host "Gen speed is less than $minimumRequiredGenSpeed. Sending email notification..."
+    Send-EmailNotification
+    exit 1
 } else {
     Write-Host "Value is $minimumRequiredGenSpeed or greater. No action needed."
 }
