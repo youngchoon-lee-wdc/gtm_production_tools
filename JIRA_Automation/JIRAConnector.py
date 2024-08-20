@@ -16,11 +16,17 @@ localub_folder_path = os.path.join(parent_folder_path, 'LocalUB')
 sys.path.append(parent_folder_path)
 sys.path.append(localub_folder_path)
 
-# Get the path of the subfolder
-
-import CICommon
-import Utils
-import LocalUnofficialBuild
+FW_REPO_NAMES = {
+    'ocl':'CE-CSSD-LAB-TOOL-ocl_automation',
+    'atlas':'FPGCSS-cssh2p2',
+    'atlas_refresh':'FPGCSS-cssh2p2',
+    'atlas3':'FPGCSS-atlas3',
+    'atlas3_8tb':'FPGCSS-atlas3',
+    'maia':'FPGCSS-polaris3',
+    'calx3':'FPGCSS-calx3',
+    'vulcan':'polaris-plus',
+    'shuri':'FPGCSS-vega',
+}
 
 CEJIRA_REST_API_URL = r"https://cejira.sandisk.com/rest/api/2/"
 CEJIRA_AGILE_REST_API_URL = r"https://cejira.sandisk.com/rest/agile/1.0/"
@@ -88,24 +94,10 @@ class CompactBuildInfoVO:
 
 class JIRAManager():
 
-    def __init__(self, project, bi, dev):
+    def __init__(self, project):
         try:
             self.project = project
-            self.request_cnt = 0
             print ("project:%s" % project)
-            if bi:
-                self.bi = bi
-            else:
-                print ('No build information')
-
-            self.config_data = None
-            self.ext_config_data = None
-            self.dev = dev
-            if self.dev == 'true':
-                config_file = os.path.join(jira_automation_config_dir, project + '_dev.json')
-            else:
-                config_file = os.path.join(jira_automation_config_dir, project + '.json')
-            self.config_data = Utils.load_config(config_file)
 
         except Exception as err:
             print (err)
@@ -143,90 +135,6 @@ class JIRAManager():
 
         return (rc, msg)
     
-    def create_issue(self):
-        rc = -1
-        jira_key = ''
-        try:
-            json_file = os.path.join(jira_automation_config_dir,  self.project + '_jira_issue_template.json')
-            jira_type = self.bi.get_jira_type()
-            if jira_type == 'GL':
-                desc_file = os.path.join(jira_automation_config_dir, self.project + '_jira_gl_desc.txt')
-            else:
-                desc_file = os.path.join(jira_automation_config_dir, self.project + '_jira_desc.txt')
-
-            json_data = None
-            with open(json_file, 'r') as jira_json_data:
-                json_data = jira_json_data.read()
-
-            today = date.today()
-
-            created = date(day=today.day, month=today.month, year=today.year).strftime('%b %d')
-            if self.dev == 'true':
-                summary = '[JIRA_CREATION_TEST]'
-            else:
-                summary = ''
-
-            summary += "%s on %s (Commit ID: %s)" % (jira_type, created, self.bi.get_commitid())
-
-            duedate = date(day=today.day, month=today.month, year=today.year).strftime('%Y-%m-%d')
-            json_data = json_data.replace('[JIRA_DUEDATE]', duedate)
-            json_data = json_data.replace('[JIRA_SUMMARY]', summary)
-            if self.project == 'atlas_refresh':
-                #Atlas sprint
-                sprint = jm.get_current_sprint(ATLAS_SPRINT_BOARD_ID)
-                sprint_id = sprint["id"]
-                sprint_name = sprint["name"]
-                json_data = json_data.replace('[JIRA_SPRINT_ID]', str(sprint_id))
-                json_data = json_data.replace('[JIRA_SPRINT_NAME]', sprint_name)
-
-            jira_assignee = get_assignee(self.project, self.config_data)
-            json_data = json_data.replace('[JIRA_ASSIGNEE]', str(jira_assignee))
-
-            description = None
-            with open(desc_file, 'r') as file_data:
-                description = file_data.read()            
-            description = description.replace('[JIRA_BRANCH]', self.bi.get_branch())
-            description = description.replace('[JIRA_COMMITID]', self.bi.get_commitid())
-            description = description.replace('[JIRA_COMMITID]', self.bi.get_commitid())
-
-            kr_shared_path = 'NA'
-            kr_shared_path = LocalUnofficialBuild.UB_BUILD_OUTPUT_PATH % (self.project, self.bi.get_commitid())
-
-            description = description.replace('[JIRA_KR_SHARED_PATH]', kr_shared_path)
-            description = description.replace('[WDCKIT_FFU]', self.bi.get_wdckit_ffu())
-            description = description.replace('[FVT_FFU]', self.bi.get_fvt_ffu())
-            json_data = json_data.replace('[JIRA_DESCRIPTION]', json.dumps(description))
-            print (json_data)
-            with open('jira_issue.json', 'w') as json_file:
-                json_file.write(json_data)
-
-            url = CEJIRA_REST_API_URL + 'issue'
-            print (url)
-            res = requests.post(url, headers=HEADERS, auth=HTTPBasicAuth(JIRA_USER, JIRA_PASS), verify=False, data=json_data)
-            print ("jira creation return code:%s" % res.status_code)
-            res_data = json.loads(res.text)
-            print (res_data)
-            if res.status_code == 204 or res.status_code == 201:
-                jira_key = res_data['key']
-                msg = "Created jira:%s" % jira_key
-                jira_watchers = self.config_data[self.project]['JIRA_watchers']
-                for watcher in jira_watchers:
-                    (rc, msg) = self.add_watcher(watcher, jira_key)
-                    if rc != 0:
-                        print ("WARNING:%s" % msg)
-                    time.sleep(2)   
-            else:
-                msg = "Failed to create a jira"
-                raise Exception(msg)
-
-            rc = 0
-
-        except Exception as err:
-            print (err)
-            traceback.print_exc(limit=None)
-            rc = 1
-
-        return (rc, jira_key)
 
     def create_sub_task_issue(self, parent_jira_key, sub_task_type):
         rc = -1
@@ -461,85 +369,11 @@ if __name__ == "__main__":
         branch = args.branch
         jira_type = args.jira_type
         DRYRUN = args.dryrun
-        st_dmpmm = args.st_dmpmm
-        st_platform = args.st_platform
-        st_oakgate = args.st_oakgate
-        st_perf = args.st_perf
-        st_rdt = args.st_rdt
-        main_jira = args.main_jira
-        fvt_ffu = args.fvt_ffu
-        wdckit_ffu = args.wdckit_ffu
-        main_build_id = args.main_build_id
         print ("project:%s" % project)
         print ("branch:%s" % branch)
         print ("jira_type:%s" % jira_type)
-        print ("st_dmpmm:%s" % st_dmpmm)
-        print ("st_platform:%s" % st_platform)
-        print ("st_oakgate:%s" % st_oakgate)
-        print ("st_perf:%s" % st_perf)
-        print ("st_rdt:%s" % st_rdt)
-        print ("main_jira:%s" % main_jira)
-        print ("fvt_ffu:%s" % fvt_ffu)
-        print ("wdckit_ffu:%s" % wdckit_ffu)
-        commit_id = ''
-        short_commit_id = ''
-        if args.commit_id and args.commit_id != '' and args.commit_id != 'None':
-            commit_id = args.commit_id
-        else:
-            repo_name = CICommon.FW_REPO_NAMES[project]
-            commit_id = CICommon.get_latest_commit_id(repo_name, branch)
-        short_commit_id = commit_id[:8]
-        print ("commit_id:%s" % commit_id)
 
-        bi = CompactBuildInfoVO(project, branch, commit_id, jira_type, 'KR', fvt_ffu, wdckit_ffu)            
-        jm = JIRAManager(project, bi, DRYRUN)
-        # jm.get_all_sprint(ATLAS_SPRINT_BOARD_ID)
-        jira_key = None
-        is_main_jira_created = False
-        if main_jira and main_jira.lower().find('-') != -1: # if main jira is exsisted, skip to create jira 
-            is_main_jira_created = True
-            jira_key = main_jira.strip().replace(',', '')
-
-        if DRYRUN == 'true' and is_main_jira_created == False:
-            jira_key = 'ATLAS-7583' #TODO:If you want to creat a jira, remove hard-coded jira key and enable to call create_issue()
-
-        if is_main_jira_created == False:
-            (status, jira_key) = jm.create_issue()
-            if status != 0:
-                raise Exception('Failed to create main jira')              
-            filepath = os.path.realpath(__file__)
-            currentDir = os.path.dirname(filepath)
-            jira_create_filename = main_build_id + '.txt'
-            jira_create_file = os.path.join(currentDir, jira_create_filename)
-            with open(jira_create_file, 'w') as jfile:
-                resultLine = "JIRA: %s" % CEJIRA_URL % jira_key
-                jfile.write(resultLine)
-
-            status = Utils.CopyFileToKRShared(commit_id[:7], jira_create_file, project)
-
-
-        if status == 0 or is_main_jira_created == True:
-            sub_task_creation_list = []
-            if st_dmpmm == 'true':
-                sub_task_creation_list.append('D')
-            if st_platform == 'true':
-                sub_task_creation_list.append('P')
-            if st_oakgate == 'true':
-                sub_task_creation_list.append('O')
-            if st_perf == 'true':
-                sub_task_creation_list.append('M')
-            if st_rdt == 'true':
-                sub_task_creation_list.append('R')
-            print (sub_task_creation_list)
-            for sub_task_type in sub_task_creation_list:
-                (status, st_jira_key) = jm.create_sub_task_issue(jira_key, sub_task_type)  
-                if status != 0:
-                    raise Exception('Failed to create sub-task jira')  
-
-            print (CEJIRA_URL % jira_key)
-
-        # jm.get_issue(jira_key)
-        # jm.update_field(project, 'status', '3', jira_key)
+        jm = JIRAManager(project)
 
     except Exception as err:
         status = 1
