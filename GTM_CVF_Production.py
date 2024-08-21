@@ -1,6 +1,6 @@
 import logging
 import os, traceback, sys
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from optparse import OptionParser
 
 _filepath = os.path.realpath(__file__)
@@ -64,13 +64,13 @@ if __name__ == "__main__":
         run_bat_cmd = 'gtm_production_%s.bat %s %s %s %s %s %s' % (project, short_commit_id, device_vendor, device_serial_number, device_capacity, cvf_version, fw_version)
         logger.debug(run_bat_cmd)
         cmd_list = run_bat_cmd.split()
-        p = Popen(cmd_list, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        p = Popen(cmd_list, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
         while True:
             output = p.stdout.readline()
-            if output == '' and p.poll() is not None:
+            if output == b'' and p.poll() is not None:
                 break
             if output:
-                logger.debug(output.strip())
+                logger.debug(output.decode().strip())  # Decode bytes to string for logging
             p.poll()
 
         rc = p.returncode 

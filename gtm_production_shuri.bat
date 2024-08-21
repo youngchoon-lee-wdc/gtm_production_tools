@@ -154,7 +154,7 @@ echo PYTHONPATH is %PYTHONPATH%
 
 cd python
 echo %cd%
-call python Production.py --sku_file=%LOCAL_BOT_PATH%\sku_file.txt --bot_file=%LOCAL_BOT_PATH%\CFG.bot --device_vendor=%device_vendor% --device_serial_number=%device_serial_number% --device_capacity=%device_capacity% --security_production=0 --device_adapter_type=edsff
+python Production.py --sku_file=%LOCAL_BOT_PATH%\sku_file.txt --bot_file=%LOCAL_BOT_PATH%\CFG.bot --device_vendor=%device_vendor% --device_serial_number=%device_serial_number% --device_capacity=%device_capacity% --security_production=0 --device_adapter_type=edsff
 IF %ERRORLEVEL% NEQ 0 (
     EXIT /B %ERRORLEVEL%
 )
