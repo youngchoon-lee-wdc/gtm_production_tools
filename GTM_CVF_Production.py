@@ -58,6 +58,9 @@ if __name__ == "__main__":
             raise Exception('GTM production tool supports to run Performance(CDM/IOMeter/SSW) only for now')        
         if len(commit_id) < 8:
             raise Exception('The commit id must be at least 8 characters long.')
+        if '_' in fw_version:
+            fw_version = fw_version.split('_')[1]
+
         short_commit_id = commit_id[:8]
         gtm_production_bat = os.path.join(os.path.dirname(_filepath), 'gtm_production_%s.bat' % project.lower())    
         logger.debug(gtm_production_bat)

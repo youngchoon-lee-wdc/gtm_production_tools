@@ -1,5 +1,5 @@
 @ECHO off
-
+git pull
 set project=shuri
 
 echo %USERNAME% is logged
