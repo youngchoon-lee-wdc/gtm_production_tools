@@ -50,7 +50,7 @@ if __name__ == "__main__":
         device_vendor = options.device_vendor
         device_serial_number = options.device_serial_number
         device_capacity = options.device_capacity
-        project = options.project
+        project = options.project.lower()
         cvf_version = options.cvf_version
         if commit_id == '' or fw_version == '' or device_vendor == '' or device_serial_number == '' or device_capacity == '' or project == '' or cvf_version == '':
             raise Exception('No given option value are found')        
@@ -62,8 +62,6 @@ if __name__ == "__main__":
             fw_version = fw_version.split('_')[1]
 
         short_commit_id = commit_id[:8]
-        gtm_production_bat = os.path.join(os.path.dirname(_filepath), 'gtm_production_%s.bat' % project.lower())    
-        logger.debug(gtm_production_bat)
         run_bat_cmd = 'gtm_production_%s.bat %s %s %s %s %s %s' % (project, short_commit_id, device_vendor, device_serial_number, device_capacity, cvf_version, fw_version)
         logger.debug(run_bat_cmd)
         cmd_list = run_bat_cmd.split()
