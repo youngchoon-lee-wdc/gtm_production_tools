@@ -1,8 +1,9 @@
 @ECHO off
+echo %USERNAME% is logged
+cd C:\Perf_Automation\gtm_production_tools
 git pull
 set project=shuri
 
-echo %USERNAME% is logged
 @REM set path=%path%;C:\Users\%USERNAME%\.pyenv\pyenv-win\versions\2.7.14;C:\Windows\System32;
 REM Run bcdedit and search for testsigning status
 
