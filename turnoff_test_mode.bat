@@ -9,7 +9,7 @@ bcdedit.exe /set testsigning off
 echo Turned OFF Test mode for measuring performance
 
 REM Specify the path to the INF file of the target driver
-set "SD_DRIVER=C:\Program Files (x86)\SanDisk\CVF_2.0_x64\Driver\SDdriver_64bitWinXX\package\SdNvmeDriver.inf"
+set "SD_DRIVER=C:\Program Files (x86)\SanDisk\CVF_3.0_x64\Driver\SDdriver_64bitWinXX\package\SdNvmeDriver.inf"
 :: Delete the driver using PnPUtil
 pnputil.exe /delete-driver "%SD_DRIVER%" /uninstall /force
 
