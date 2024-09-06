@@ -65,7 +65,7 @@ if /I "%FW_CHAR%"=="ALA" (
     set PSET=shuri_asic
 )
 if /I "%FW_CHAR%"=="ALP" (
-    set PSET=shuri_asic_perf
+    set PSET=shuri_perf
 )
 
 echo PSET is %PSET%
