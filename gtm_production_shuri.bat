@@ -155,7 +155,19 @@ echo PYTHONPATH is %PYTHONPATH%
 
 cd python
 echo %cd%
-python Production.py --sku_file=%LOCAL_BOT_PATH%\sku_file.txt --bot_file=%LOCAL_BOT_PATH%\CFG.bot --device_vendor=%device_vendor% --device_serial_number=%device_serial_number% --device_capacity=%device_capacity% --security_production=0 --device_adapter_type=edsff
+:: Convert CVFVersion to a number and compare
+set /a "versionNumber=%CVFVersion%"
+set "PRODUCTION_ARGS=--sku_file=%LOCAL_BOT_PATH%\sku_file.txt --bot_file=%LOCAL_BOT_PATH%\CFG.bot --device_vendor=%device_vendor% --device_serial_number=%device_serial_number% --device_capacity=%device_capacity% --security_production=0 --device_adapter_type=edsff"
+:: Check if CVF version is 240806 or greater
+if %versionNumber% geq 240806 (
+    echo Calling JSONProduction.py
+    python JSONProduction.py --production_json_file_path="C:\Program Files (x86)\SanDisk\CVF_3.0_x64\Python\production_flow_hw_no_ram.json" %PRODUCTION_ARGS%
+) else (
+    echo Calling Production.py
+    python Production.py %PRODUCTION_ARGS%
+)
+
+
 IF %ERRORLEVEL% NEQ 0 (
     EXIT /B %ERRORLEVEL%
 )
